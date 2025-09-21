@@ -1,12 +1,9 @@
-// routes/transactions.js
 import express from 'express';
 import auth from '../middleware/auth.js';
-import { getTransactions } from '../controllers/transactionController.js';
+import { listTransactions } from '../controllers/transactionController.js';  // ✅ match name
 
 const router = express.Router();
 
-// GET /api/transactions
-router.get('/', auth, getTransactions);
-
+router.get('/', auth, listTransactions);  // ✅ correct function
 export default router;
 
