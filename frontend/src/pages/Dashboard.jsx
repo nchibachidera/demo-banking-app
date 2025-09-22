@@ -23,7 +23,7 @@ export default function Dashboard() {
         const acc = await getAccount(token);
         setAccount(acc.data);
 
-        const tx = await getTransactions(token);
+        const tx = await getTransactions(token); // ✅ now passes token
         setTransactions(tx.data);
       } catch (err) {
         console.error(err);
@@ -39,7 +39,7 @@ export default function Dashboard() {
       const acc = await getAccount(token);
       setAccount(acc.data);
 
-      const tx = await getTransactions(token);
+      const tx = await getTransactions(token); // ✅ now passes token
       setTransactions(tx.data);
     } catch (err) {
       console.error(err);
@@ -49,7 +49,7 @@ export default function Dashboard() {
   const handleDeposit = async () => {
     if (!amount) return setMsg("Enter an amount first!");
     try {
-      await depositAmount(token, amount);
+      await depositAmount(token, amount); // ✅ token passed
       setMsg("✅ Deposit successful");
       setAmount("");
       refreshData();
@@ -61,7 +61,7 @@ export default function Dashboard() {
   const handleWithdraw = async () => {
     if (!amount) return setMsg("Enter an amount first!");
     try {
-      await withdrawAmount(token, amount);
+      await withdrawAmount(token, amount); // ✅ token passed
       setMsg("✅ Withdrawal successful");
       setAmount("");
       refreshData();
@@ -121,5 +121,6 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 

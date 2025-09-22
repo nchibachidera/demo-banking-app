@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const generateAccountNumber = () => {
-  return (Math.floor(1000000000 + Math.random() * 9000000000)).toString();
-};
+// helper: generate random 10-digit account number
+function generateAccountNumber() {
+  return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+}
 
 // ✅ Register
 export async function register(req, res) {
@@ -29,19 +30,38 @@ export async function register(req, res) {
     // generate account number
     const accountNumber = generateAccountNumber();
 
-    // insert into users table
+    // insert into users (with account_number + balance)
     const userRes = await db.query(
       `INSERT INTO users (full_name, email, password, account_number, balance)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, full_name, email, account_number, balance, created_at`,
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, full_name, email, account_number, balance, created_at`,
       [full_name, email, hashed, accountNumber, 0.00]
     );
 
     const user = userRes.rows[0];
 
+    // optional: also store account separately in accounts table
+    await db.query(
+      `INSERT INTO accounts (user_id, account_number, balance)
+       VALUES ($1, $2, $3)`,
+      [user.id, accountNumber, 0.00]
+    );
+
     // generate JWT
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET);
 
-    res.json({ message: "User registered successfully", user, token });
+    res.json({
+      message: "User registered successfully",
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        account_number: user.account_number,
+        balance: user.balance,
+        created_at: user.created_at
+      },
+      token
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
@@ -58,7 +78,11 @@ export async function login(req, res) {
 
   try {
     // check if user exists
-    const userRes = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    const userRes = await db.query(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
+
     if (!userRes.rows.length) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -74,12 +98,27 @@ export async function login(req, res) {
     // generate JWT
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET);
 
-    res.json({ message: "Login successful", user: { id: user.id, full_name: user.full_name, email: user.email, account_number: user.account_number, balance: user.balance }, token });
+    res.json({
+      message: "Login successful",
+      user: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        account_number: user.account_number,
+        balance: user.balance,
+        created_at: user.created_at
+      },
+      token
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 }
+
+
+
+
 
 
 

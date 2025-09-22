@@ -1,11 +1,27 @@
 import api from "../api";
 
 // ✅ Get account info
-export const getAccount = () => api.get("/accounts/me"); // <-- updated
+export const getAccount = (token) =>
+  api.get("/accounts", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
 // ✅ Deposit money
-export const depositAmount = (amount) => api.post("/accounts/deposit", { amount });
+export const depositAmount = (token, amount) =>
+  api.post(
+    "/accounts/deposit",
+    { amount },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
 
 // ✅ Withdraw money
-export const withdrawAmount = (amount) => api.post("/accounts/withdraw", { amount });
+export const withdrawAmount = (token, amount) =>
+  api.post(
+    "/accounts/withdraw",
+    { amount },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+
+
 

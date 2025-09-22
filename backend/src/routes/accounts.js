@@ -5,7 +5,7 @@ import { getAccount, deposit, withdraw } from '../controllers/accountController.
 const router = express.Router();
 
 // Change this line:
-router.get('/me', auth, getAccount); // <-- use /me so frontend can call /accounts/me
+router.get('/', auth, getAccount);
 router.post('/deposit', auth, deposit);
 router.post('/withdraw', auth, withdraw);
 

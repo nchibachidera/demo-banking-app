@@ -15,6 +15,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/accounts", accountRoutes);
 app.use("/api/transactions", txRoutes);
+console.log("✅ Routes loaded");
+
 
 app.get("/", (req, res) => res.send({ message: "Demo banking backend running" }));
 
