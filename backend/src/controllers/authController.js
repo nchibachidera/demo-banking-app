@@ -116,6 +116,38 @@ export async function login(req, res) {
   }
 }
 
+// 🔧 TEMPORARY: Fix accounts for existing users
+export async function fixAccounts(req, res) {
+  try {
+    // Find users without accounts
+    const usersWithoutAccounts = await db.query(`
+      SELECT id, account_number, balance 
+      FROM users 
+      WHERE id NOT IN (SELECT user_id FROM accounts WHERE user_id IS NOT NULL)
+    `);
+    
+    console.log('Users without accounts found:', usersWithoutAccounts.rows);
+    
+    // Create accounts for them
+    for (const user of usersWithoutAccounts.rows) {
+      await db.query(
+        'INSERT INTO accounts (user_id, account_number, balance) VALUES ($1, $2, $3)',
+        [user.id, user.account_number, user.balance]
+      );
+      console.log(`Created account for user ID ${user.id}`);
+    }
+    
+    res.json({ 
+      message: 'Fixed accounts for existing users', 
+      count: usersWithoutAccounts.rows.length,
+      users: usersWithoutAccounts.rows
+    });
+  } catch (err) {
+    console.error('Error fixing accounts:', err);
+    res.status(500).json({ message: 'Error fixing accounts' });
+  }
+}
+
 
 
 

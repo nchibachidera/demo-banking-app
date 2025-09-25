@@ -105,7 +105,7 @@ const BankingDashboard = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <div>
                   <h2 className="display-5 fw-bold text-dark mb-1">
-                    {showBalance ? `₦${parseFloat(account.balance).toLocaleString()}` : '••••••'}
+                    {showBalance ? `₦${parseFloat(account.balance).toFixed(2)}` : '••••••'}
                   </h2>
                   <small className="text-success">Available Balance</small>
                 </div>
@@ -252,7 +252,7 @@ const BankingDashboard = () => {
                           {transaction.type === 'deposit' ? '+' : '-'}₦{parseFloat(transaction.amount).toFixed(2)}
                         </h6>
                         {account && (
-                          <small className="text-muted">Balance: ₦{parseFloat(account.balance).toLocaleString()}</small>
+                          <small className="text-muted">Balance: ₦{parseFloat(account.balance).toFixed(2)}</small>
                         )}
                       </div>
                     </div>

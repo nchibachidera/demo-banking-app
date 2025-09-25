@@ -1,4 +1,3 @@
-// controllers/accountController.js
 import db from '../config/db.js';
 
 export async function getAccount(req, res) {
