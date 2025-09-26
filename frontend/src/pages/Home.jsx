@@ -197,7 +197,7 @@ export default function Home() {
       <footer className="bg-dark text-light py-4 mt-5">
         <div className="container">
           <div className="text-center">
-            <p className="mb-0">&copy; 2024 MyBank Demo. Built for demonstration purposes.</p>
+            <p className="mb-0">&copy; 2025 MyBank. Banking made simple and secure.</p>
           </div>
         </div>
       </footer>

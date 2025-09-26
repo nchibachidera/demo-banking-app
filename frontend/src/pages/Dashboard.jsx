@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getAccount, depositAmount, withdrawAmount } from "../services/accountService";
 import { getTransactions } from "../services/transactionService";
 
-const BankingDashboard = () => {
-  // Original state from your dashboard
+const ProfessionalBankingDashboard = () => {
   const [account, setAccount] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [amount, setAmount] = useState("");
@@ -12,11 +11,9 @@ const BankingDashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  // UI state for the enhanced interface
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showBalance, setShowBalance] = useState(true);
 
-  // Your original authentication and data fetching logic
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -30,7 +27,7 @@ const BankingDashboard = () => {
         setTransactions(tx.data);
       } catch (err) {
         console.error(err);
-        setMsg("❌ Failed to load account or transactions.");
+        setMsg("Failed to load account or transactions.");
       }
     };
     fetchData();
@@ -51,7 +48,7 @@ const BankingDashboard = () => {
     if (!amount) return setMsg("Enter an amount first!");
     try {
       await depositAmount(token, amount);
-      setMsg("✅ Deposit successful");
+      setMsg("Deposit successful");
       setAmount("");
       refreshData();
     } catch (err) {
@@ -63,7 +60,7 @@ const BankingDashboard = () => {
     if (!amount) return setMsg("Enter an amount first!");
     try {
       await withdrawAmount(token, amount);
-      setMsg("✅ Withdrawal successful");
+      setMsg("Withdrawal successful");
       setAmount("");
       refreshData();
     } catch (err) {
@@ -76,277 +73,299 @@ const BankingDashboard = () => {
     navigate("/");
   };
 
-  // Dashboard component with real data
   const Dashboard = () => (
-    <div className="row g-4">
-      {/* Welcome Section */}
-      <div className="col-12">
-        <div className="card border-0 shadow-sm rounded-4" 
-             style={{ background: 'linear-gradient(135deg, #007bff, #6f42c1)' }}>
-          <div className="card-body text-white p-4">
-            <h1 className="h3 fw-bold mb-2">Welcome back!</h1>
-            <p className="mb-0 opacity-75">Here's your financial overview</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Account Balance Card */}
-      {account && (
-        <div className="col-12">
-          <div className="card border-0 shadow-sm rounded-4">
-            <div className="card-body p-4">
-              <div className="d-flex justify-content-between align-items-start mb-3">
-                <div>
-                  <h5 className="card-title fw-semibold mb-1">Main Account</h5>
-                  <small className="text-muted">Account: {account.account_number}</small>
-                </div>
-                <span className="badge bg-primary rounded-pill">💳</span>
-              </div>
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h2 className="display-5 fw-bold text-dark mb-1">
-                    {showBalance ? `₦${parseFloat(account.balance).toFixed(2)}` : '••••••'}
-                  </h2>
-                  <small className="text-success">Available Balance</small>
-                </div>
-                <button
-                  onClick={() => setShowBalance(!showBalance)}
-                  className="btn btn-outline-secondary btn-sm rounded-circle"
-                  style={{ width: '40px', height: '40px' }}
-                >
-                  {showBalance ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Deposit/Withdraw Section */}
-      <div className="col-12">
-        <div className="card border-0 shadow-sm rounded-4">
-          <div className="card-body p-4">
-            <h5 className="card-title fw-bold mb-4">Quick Actions</h5>
-            <div className="row g-3">
-              <div className="col-md-6">
-                <input
-                  className="form-control form-control-lg"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  type="number"
-                  min="1"
-                />
-              </div>
-              <div className="col-md-6">
-                <div className="d-flex gap-2">
-                  <button 
-                    className="btn btn-success btn-lg flex-fill"
-                    onClick={handleDeposit}
-                  >
-                    ➕ Deposit
-                  </button>
-                  <button 
-                    className="btn btn-warning btn-lg flex-fill"
-                    onClick={handleWithdraw}
-                  >
-                    📤 Withdraw
-                  </button>
+    <div className="row g-0">
+      {/* Main Content */}
+      <div className="col-md-8">
+        <div className="p-4">
+          {/* Balance Cards */}
+          <div className="row g-3 mb-4">
+            <div className="col-md-6">
+              <div className="card border-0" style={{ backgroundColor: '#f8f9fc' }}>
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <span className="text-muted small">Total Balance</span>
+                    <span className="badge bg-success small">+2.36%</span>
+                  </div>
+                  {account && (
+                    <h3 className="mb-0 fw-bold" style={{ color: '#2c3e50' }}>
+                      {showBalance ? `₦${parseFloat(account.balance).toFixed(2)}` : '••••••'}
+                    </h3>
+                  )}
                 </div>
               </div>
             </div>
-            {msg && (
-              <div className={`alert mt-3 ${
-                msg.includes('✅') ? 'alert-success' : 'alert-danger'
-              }`}>
-                {msg}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Transactions */}
-      <div className="col-12">
-        <div className="card border-0 shadow-sm rounded-4">
-          <div className="card-header bg-transparent border-0 p-4">
-            <h5 className="card-title fw-bold mb-0">Recent Transactions</h5>
-          </div>
-          <div className="card-body p-0">
-            {transactions.length > 0 ? (
-              <div className="list-group list-group-flush">
-                {transactions.slice(0, 5).map((transaction) => (
-                  <div key={transaction.id} className="list-group-item border-0 p-4">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center">
-                        <div className={`rounded-3 d-inline-flex align-items-center justify-content-center me-3 ${
-                          transaction.type === 'deposit' ? 'bg-success-subtle' : 'bg-danger-subtle'
-                        }`} style={{ width: '45px', height: '45px' }}>
-                          <span style={{ fontSize: '1.2rem' }}>
-                            {transaction.type === 'deposit' ? '📥' : '📤'}
-                          </span>
-                        </div>
-                        <div>
-                          <h6 className="mb-1 fw-semibold text-capitalize">{transaction.type}</h6>
-                          <small className="text-muted">{new Date(transaction.created_at).toLocaleDateString()}</small>
-                        </div>
-                      </div>
-                      <h6 className={`mb-0 fw-bold ${
-                        transaction.type === 'deposit' ? 'text-success' : 'text-danger'
-                      }`}>
-                        {transaction.type === 'deposit' ? '+' : '-'}₦{parseFloat(transaction.amount).toFixed(2)}
-                      </h6>
-                    </div>
+            <div className="col-md-6">
+              <div className="card border-0" style={{ backgroundColor: '#f8f9fc' }}>
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <span className="text-muted small">Available</span>
+                    <span className="badge bg-info small">Available</span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center p-5">
-                <div className="text-muted mb-3" style={{ fontSize: '3rem' }}>💳</div>
-                <h6 className="text-muted">No transactions yet.</h6>
-                <small className="text-muted">Start by making a deposit or withdrawal above!</small>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // All Transactions view
-  const Transactions = () => (
-    <div className="row g-4">
-      <div className="col-12">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="fw-bold">All Transactions</h2>
-        </div>
-      </div>
-
-      <div className="col-12">
-        <div className="card border-0 shadow-sm rounded-4">
-          <div className="card-body p-0">
-            {transactions.length > 0 ? (
-              <div className="list-group list-group-flush">
-                {transactions.map((transaction) => (
-                  <div key={transaction.id} className="list-group-item border-0 p-4">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center">
-                        <div className={`rounded-3 d-inline-flex align-items-center justify-content-center me-3 ${
-                          transaction.type === 'deposit' ? 'bg-success-subtle' : 'bg-danger-subtle'
-                        }`} style={{ width: '50px', height: '50px' }}>
-                          <span style={{ fontSize: '1.5rem' }}>
-                            {transaction.type === 'deposit' ? '📥' : '📤'}
-                          </span>
-                        </div>
-                        <div>
-                          <h6 className="mb-1 fw-semibold text-capitalize">{transaction.type}</h6>
-                          <small className="text-muted">
-                            {new Date(transaction.created_at).toLocaleString()}
-                          </small>
-                        </div>
-                      </div>
-                      <div className="text-end">
-                        <h6 className={`mb-1 fw-bold ${
-                          transaction.type === 'deposit' ? 'text-success' : 'text-danger'
-                        }`}>
-                          {transaction.type === 'deposit' ? '+' : '-'}₦{parseFloat(transaction.amount).toFixed(2)}
-                        </h6>
-                        {account && (
-                          <small className="text-muted">Balance: ₦{parseFloat(account.balance).toFixed(2)}</small>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center p-5">
-                <div className="text-muted mb-3" style={{ fontSize: '4rem' }}>💳</div>
-                <h5 className="text-muted">No transactions found.</h5>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // Account Overview
-  const AccountOverview = () => (
-    <div className="row g-4">
-      <div className="col-12">
-        <h2 className="fw-bold">Account Overview</h2>
-      </div>
-      
-      {account && (
-        <>
-          {/* Total Balance Card */}
-          <div className="col-12">
-            <div className="card border-0 shadow-lg rounded-4" 
-                 style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
-              <div className="card-body text-white p-5">
-                <div className="d-flex justify-content-between align-items-start">
-                  <div>
-                    <p className="mb-2 opacity-75">Account Balance</p>
-                    <h1 className="display-3 fw-bold mb-3">
-                      {showBalance ? `₦${parseFloat(account.balance).toLocaleString()}` : '••••••••'}
-                    </h1>
-                    <p className="mb-0 opacity-75">Account: {account.account_number}</p>
-                  </div>
-                  <button
-                    onClick={() => setShowBalance(!showBalance)}
-                    className="btn btn-outline-light rounded-circle"
-                    style={{ width: '50px', height: '50px' }}
-                  >
-                    {showBalance ? '👁️' : '👁️‍🗨️'}
-                  </button>
+                  {account && (
+                    <h3 className="mb-0 fw-bold" style={{ color: '#2c3e50' }}>
+                      {showBalance ? `₦${parseFloat(account.balance).toFixed(2)}` : '••••••'}
+                    </h3>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Account Details */}
-          <div className="col-12">
-            <div className="card border-0 shadow-sm rounded-4">
-              <div className="card-body p-4">
-                <div className="d-flex justify-content-between align-items-start mb-4">
-                  <div>
-                    <h4 className="fw-semibold mb-1">Main Account</h4>
-                    <p className="text-muted mb-0">Account Number: {account.account_number}</p>
-                  </div>
-                  <span className="badge bg-primary rounded-pill px-3 py-2">Active</span>
+          {/* Quick Actions */}
+          <div className="card border-0 mb-4" style={{ backgroundColor: '#ffffff', boxShadow: '0 0.125rem 0.25rem rgba(0,0,0,0.075)' }}>
+            <div className="card-header bg-transparent border-0 pt-3 pb-2">
+              <h6 className="mb-0 fw-semibold" style={{ color: '#2c3e50' }}>Quick Transfer</h6>
+            </div>
+            <div className="card-body pt-2">
+              <div className="row g-3">
+                <div className="col-md-8">
+                  <input
+                    className="form-control"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    type="text"
+                    inputMode="decimal"
+                    style={{ border: '1px solid #e3e6f0', borderRadius: '0.35rem' }}
+                  />
                 </div>
-                
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <div>
-                    <h2 className="display-4 fw-bold text-dark mb-1">
-                      {showBalance ? `₦${parseFloat(account.balance).toLocaleString()}` : '••••••••'}
-                    </h2>
-                    <small className="text-success">Available Balance</small>
-                  </div>
+                <div className="col-md-4">
                   <div className="d-flex gap-2">
                     <button 
-                      onClick={() => setActiveTab('dashboard')}
-                      className="btn btn-primary rounded-pill px-4"
+                      className="btn btn-sm flex-fill"
+                      onClick={handleDeposit}
+                      style={{ 
+                        backgroundColor: '#1cc88a', 
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.35rem'
+                      }}
                     >
-                      Manage Account
+                      Deposit
+                    </button>
+                    <button 
+                      className="btn btn-sm flex-fill"
+                      onClick={handleWithdraw}
+                      style={{ 
+                        backgroundColor: '#f6c23e', 
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.35rem'
+                      }}
+                    >
+                      Withdraw
                     </button>
                   </div>
                 </div>
+              </div>
+              {msg && (
+                <div className={`mt-2 p-2 small rounded ${
+                  msg.includes('successful') 
+                    ? 'text-success' 
+                    : 'text-danger'
+                }`} style={{ backgroundColor: msg.includes('successful') ? '#d1e7dd' : '#f8d7da' }}>
+                  {msg}
+                </div>
+              )}
+            </div>
+          </div>
 
-                {/* Account activity indicator */}
-                <div className="card bg-light border-0 rounded-3" style={{ minHeight: '80px' }}>
-                  <div className="card-body d-flex align-items-center justify-content-center">
-                    <span className="me-2" style={{ fontSize: '2rem' }}>📈</span>
-                    <span className="text-primary fw-semibold">
-                      {transactions.length} transactions total
-                    </span>
-                  </div>
+          {/* Statistics Chart Placeholder */}
+          <div className="card border-0" style={{ backgroundColor: '#ffffff', boxShadow: '0 0.125rem 0.25rem rgba(0,0,0,0.075)' }}>
+            <div className="card-header bg-transparent border-0 pt-3 pb-2">
+              <h6 className="mb-0 fw-semibold" style={{ color: '#2c3e50' }}>Account Activity</h6>
+            </div>
+            <div className="card-body">
+              <div style={{ height: '200px', backgroundColor: '#f8f9fc', borderRadius: '0.25rem' }} className="d-flex align-items-center justify-content-center">
+                <div className="text-center text-muted">
+                  <div style={{ fontSize: '48px', marginBottom: '8px' }}>📊</div>
+                  <small>Account activity chart</small>
                 </div>
               </div>
             </div>
           </div>
-        </>
+        </div>
+      </div>
+
+      {/* Right Sidebar */}
+      <div className="col-md-4" style={{ backgroundColor: '#f8f9fc', borderLeft: '1px solid #e3e6f0' }}>
+        <div className="p-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h6 className="mb-0 fw-semibold" style={{ color: '#2c3e50' }}>Transactions</h6>
+            <button 
+              className="btn btn-sm btn-link p-0 text-decoration-none"
+              onClick={() => setActiveTab('transactions')}
+              style={{ color: '#858796' }}
+            >
+              View all
+            </button>
+          </div>
+          
+          <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+            {transactions.length > 0 ? (
+              transactions.slice(0, 8).map((transaction) => (
+                <div key={transaction.id} className="d-flex align-items-center mb-3 p-2 rounded" style={{ backgroundColor: 'white' }}>
+                  <div 
+                    className="rounded-circle d-flex align-items-center justify-content-center me-3"
+                    style={{ 
+                      width: '40px', 
+                      height: '40px',
+                      backgroundColor: transaction.type === 'deposit' ? '#1cc88a20' : '#e74a3b20'
+                    }}
+                  >
+                    <div style={{ 
+                      width: '8px', 
+                      height: '8px', 
+                      borderRadius: '50%',
+                      backgroundColor: transaction.type === 'deposit' ? '#1cc88a' : '#e74a3b'
+                    }}></div>
+                  </div>
+                  <div className="flex-grow-1">
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div>
+                        <div className="fw-medium small text-capitalize" style={{ color: '#2c3e50' }}>
+                          {transaction.type}
+                        </div>
+                        <div className="text-muted" style={{ fontSize: '11px' }}>
+                          {new Date(transaction.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="text-end">
+                        <div className={`fw-medium small ${
+                          transaction.type === 'deposit' ? 'text-success' : 'text-danger'
+                        }`}>
+                          {transaction.type === 'deposit' ? '+' : '-'}₦{parseFloat(transaction.amount).toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-muted py-4">
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>💳</div>
+                <small>No transactions yet</small>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Transactions = () => (
+    <div className="p-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h5 className="mb-0 fw-semibold" style={{ color: '#2c3e50' }}>All Transactions</h5>
+      </div>
+
+      <div className="card border-0" style={{ boxShadow: '0 0.125rem 0.25rem rgba(0,0,0,0.075)' }}>
+        <div className="table-responsive">
+          <table className="table table-hover mb-0">
+            <thead style={{ backgroundColor: '#f8f9fc' }}>
+              <tr>
+                <th className="border-0 fw-medium text-muted small py-3">Type</th>
+                <th className="border-0 fw-medium text-muted small py-3">Date</th>
+                <th className="border-0 fw-medium text-muted small py-3 text-end">Amount</th>
+                <th className="border-0 fw-medium text-muted small py-3 text-end">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.length > 0 ? (
+                transactions.map((transaction) => (
+                  <tr key={transaction.id}>
+                    <td className="py-3">
+                      <div className="d-flex align-items-center">
+                        <div 
+                          className="rounded-circle d-flex align-items-center justify-content-center me-3"
+                          style={{ 
+                            width: '32px', 
+                            height: '32px',
+                            backgroundColor: transaction.type === 'deposit' ? '#1cc88a20' : '#e74a3b20'
+                          }}
+                        >
+                          <div style={{ 
+                            width: '6px', 
+                            height: '6px', 
+                            borderRadius: '50%',
+                            backgroundColor: transaction.type === 'deposit' ? '#1cc88a' : '#e74a3b'
+                          }}></div>
+                        </div>
+                        <span className="fw-medium text-capitalize" style={{ color: '#2c3e50' }}>
+                          {transaction.type}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 text-muted small">
+                      {new Date(transaction.created_at).toLocaleString()}
+                    </td>
+                    <td className={`py-3 text-end fw-medium ${
+                      transaction.type === 'deposit' ? 'text-success' : 'text-danger'
+                    }`}>
+                      {transaction.type === 'deposit' ? '+' : '-'}₦{parseFloat(transaction.amount).toFixed(2)}
+                    </td>
+                    <td className="py-3 text-end text-muted small">
+                      {account && `₦${parseFloat(account.balance).toFixed(2)}`}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center py-4 text-muted">
+                    No transactions found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  const AccountOverview = () => (
+    <div className="p-4">
+      <h5 className="mb-4 fw-semibold" style={{ color: '#2c3e50' }}>Account Overview</h5>
+      
+      {account && (
+        <div className="row g-3">
+          <div className="col-md-8">
+            <div className="card border-0" style={{ backgroundColor: '#4e73df', color: 'white' }}>
+              <div className="card-body p-4">
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <div className="small mb-1 opacity-75">Account Balance</div>
+                    <h2 className="mb-0 fw-bold">
+                      {showBalance ? `₦${parseFloat(account.balance).toFixed(2)}` : '••••••••'}
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => setShowBalance(!showBalance)}
+                    className="btn btn-sm btn-outline-light"
+                    style={{ border: '1px solid rgba(255,255,255,0.3)' }}
+                  >
+                    {showBalance ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                <div className="small opacity-75">
+                  Account: {account.account_number}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card border-0 h-100" style={{ backgroundColor: '#f8f9fc' }}>
+              <div className="card-body d-flex flex-column justify-content-center text-center">
+                <div className="mb-2" style={{ fontSize: '32px' }}>📈</div>
+                <div className="fw-medium" style={{ color: '#2c3e50' }}>
+                  {transactions.length} Total
+                </div>
+                <small className="text-muted">Transactions</small>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -356,10 +375,10 @@ const BankingDashboard = () => {
       return (
         <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '400px' }}>
           <div className="text-center">
-            <div className="spinner-border text-primary mb-3" role="status">
+            <div className="spinner-border" role="status" style={{ color: '#4e73df' }}>
               <span className="visually-hidden">Loading...</span>
             </div>
-            <p className="text-muted">Loading account details...</p>
+            <div className="mt-2 text-muted">Loading account details...</div>
           </div>
         </div>
       );
@@ -374,82 +393,84 @@ const BankingDashboard = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-light">
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div className="min-vh-100" style={{ backgroundColor: '#f8f9fc' }}>
+      {/* Top Navigation */}
+      <nav className="navbar navbar-expand-lg" style={{ backgroundColor: 'white', borderBottom: '1px solid #e3e6f0' }}>
         <div className="container-fluid px-4">
           <div className="d-flex align-items-center">
-            <div className="bg-gradient rounded-3 me-2" 
-                 style={{ width: '32px', height: '32px', background: 'linear-gradient(45deg, #007bff, #6f42c1)' }}></div>
-            <span className="navbar-brand h4 fw-bold mb-0">MyBank</span>
+            <div 
+              className="rounded me-3 d-flex align-items-center justify-content-center"
+              style={{ 
+                width: '40px', 
+                height: '40px', 
+                backgroundColor: '#4e73df',
+                color: 'white'
+              }}
+            >
+              <span className="fw-bold">B</span>
+            </div>
+            <span className="navbar-brand h5 fw-bold mb-0" style={{ color: '#2c3e50' }}>
+              Banking Portal
+            </span>
           </div>
           
-          <div className="d-none d-lg-flex ms-5">
-            {[
-              { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
-              { id: 'transactions', label: 'Transactions', icon: '💳' },
-              { id: 'accounts', label: 'Account', icon: '📊' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`btn btn-link text-decoration-none me-3 ${
-                  activeTab === tab.id 
-                    ? 'text-primary fw-semibold' 
-                    : 'text-secondary'
-                }`}
-              >
-                <span className="me-1">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
           <div className="d-flex align-items-center">
-            <div className="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" 
-                 style={{ width: '32px', height: '32px' }}>
-              <span>👤</span>
+            <div className="me-3 text-end">
+              <div className="fw-medium small" style={{ color: '#2c3e50' }}>Online Banking</div>
+              <div className="text-muted" style={{ fontSize: '11px' }}>
+                {new Date().toLocaleDateString()}
+              </div>
             </div>
-            <button className="btn btn-link text-secondary p-1 me-2">⚙️</button>
             <button 
-              className="btn btn-link text-secondary p-1" 
+              className="btn btn-sm btn-outline-secondary"
               onClick={handleLogout}
-              title="Logout"
             >
-              🚪
+              Sign Out
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Navigation */}
-      <div className="d-lg-none bg-white border-top">
-        <div className="d-flex justify-content-around py-2">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
-            { id: 'transactions', label: 'Transactions', icon: '💳' },
-            { id: 'accounts', label: 'Account', icon: '📊' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`btn btn-link text-decoration-none d-flex flex-column align-items-center p-2 ${
-                activeTab === tab.id ? 'text-primary' : 'text-secondary'
-              }`}
-            >
-              <span style={{ fontSize: '1.2rem' }}>{tab.icon}</span>
-              <small className="mt-1">{tab.label}</small>
-            </button>
-          ))}
+      {/* Side Navigation */}
+      <div className="d-flex">
+        <div style={{ width: '220px', backgroundColor: 'white', minHeight: 'calc(100vh - 70px)', borderRight: '1px solid #e3e6f0' }}>
+          <div className="p-3">
+            <nav className="nav flex-column">
+              {[
+                { id: 'dashboard', label: 'Dashboard', icon: '⊞' },
+                { id: 'transactions', label: 'Transactions', icon: '⟷' },
+                { id: 'accounts', label: 'Accounts', icon: '⚏' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`nav-link btn text-start border-0 mb-1 ${
+                    activeTab === tab.id 
+                      ? 'fw-medium' 
+                      : ''
+                  }`}
+                  style={{ 
+                    color: activeTab === tab.id ? '#4e73df' : '#858796',
+                    backgroundColor: activeTab === tab.id ? '#eaecf4' : 'transparent'
+                  }}
+                >
+                  <span className="me-2">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-grow-1">
+          {renderContent()}
         </div>
       </div>
-
-      {/* Main Content */}
-      <main className="container-fluid px-4 py-4" style={{ maxWidth: '1400px' }}>
-        {renderContent()}
-      </main>
     </div>
   );
 };
 
-export default BankingDashboard;
+export default ProfessionalBankingDashboard;
+
+
