@@ -6,9 +6,9 @@ const router = express.Router();
 
 // Change this line:
 router.get('/', auth, getAccount);
-router.post('/transfer', auth, transfer);
 router.post('/deposit', auth, deposit);
 router.post('/withdraw', auth, withdraw);
+router.post('/transfer', auth, transfer);
 
 export default router;
 

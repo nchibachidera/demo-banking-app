@@ -22,6 +22,14 @@ export const withdrawAmount = (token, amount) =>
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
+  // ✅ Withdraw money
+export const transferAmount = (token, amount) =>
+  api.post(
+    "/accounts/transfer",
+    { amount },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
 
 
 

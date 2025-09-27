@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAccount, depositAmount, withdrawAmount } from "../services/accountService";
+import { getAccount, depositAmount, withdrawAmount, transferAmount } from "../services/accountService";
 import { getTransactions } from "../services/transactionService";
 
 const ProfessionalBankingDashboard = () => {
@@ -65,6 +65,19 @@ const ProfessionalBankingDashboard = () => {
       refreshData();
     } catch (err) {
       setMsg(err.response?.data?.message || "Withdrawal failed");
+    }
+  };
+
+
+  const handleTransfer = async () => {
+    if (!amount) return setMsg("Enter an amount first!");
+    try {
+      await transferAmount(token, amount);
+      setMsg("transfer successful");
+      setAmount("");
+      refreshData();
+    } catch (err) {
+      setMsg(err.response?.data?.message || "transfer failed");
     }
   };
 
